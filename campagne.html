@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 
   <title>Campagne gallo-romaine autour de Béziers</title>
 
@@ -16,11 +16,12 @@
   <div id="startOverlay" class="start-overlay">
     <h1>Campagne gallo-romaine autour de Béziers</h1>
     <p>Appuyez pour lancer la vidéo 360°.</p>
-    <p class="small">Tournez le téléphone ou faites glisser l’image avec le doigt.</p>
+    <p class="small">Tournez le téléphone pour regarder autour de vous.</p>
     <button id="startButton" type="button">Lancer</button>
   </div>
 
   <a-scene
+    id="scene360"
     vr-mode-ui="enabled: true"
     renderer="antialias: true"
     embedded
@@ -40,7 +41,9 @@
     <a-videosphere src="#video360" rotation="0 -90 0"></a-videosphere>
 
     <a-camera
-      look-controls="magicWindowTrackingEnabled: true"
+      id="camera360"
+      camera="fov: 75"
+      look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true"
       wasd-controls="enabled: false"
     ></a-camera>
   </a-scene>
@@ -49,6 +52,8 @@
     const overlay = document.getElementById("startOverlay");
     const button = document.getElementById("startButton");
     const video = document.getElementById("video360");
+    const scene = document.getElementById("scene360");
+    const camera = document.getElementById("camera360");
 
     button.addEventListener("click", async () => {
       overlay.style.display = "none";
@@ -61,6 +66,42 @@
         await video.play();
       }
     });
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    let startDistance = null;
+    let startFov = 75;
+
+    scene.addEventListener("touchstart", (event) => {
+      if (event.touches.length === 2) {
+        startDistance = getTouchDistance(event.touches);
+        startFov = camera.getAttribute("camera").fov || 75;
+      }
+    }, { passive: false });
+
+    scene.addEventListener("touchmove", (event) => {
+      if (event.touches.length === 2 && startDistance) {
+        event.preventDefault();
+        const currentDistance = getTouchDistance(event.touches);
+        const nextFov = clamp(startFov * (startDistance / currentDistance), 35, 100);
+        camera.setAttribute("camera", "fov", nextFov);
+      }
+    }, { passive: false });
+
+    scene.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const currentFov = camera.getAttribute("camera").fov || 75;
+      const nextFov = clamp(currentFov + event.deltaY * 0.03, 35, 100);
+      camera.setAttribute("camera", "fov", nextFov);
+    }, { passive: false });
   </script>
 </body>
 </html>

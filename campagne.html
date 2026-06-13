@@ -24,6 +24,7 @@
     id="scene360"
     vr-mode-ui="enabled: true"
     renderer="antialias: true"
+    device-orientation-permission-ui="enabled: false"
     embedded
   >
     <a-assets>
@@ -59,16 +60,28 @@
     const rig = document.getElementById("cameraRig");
 
     button.addEventListener("click", async () => {
-      overlay.style.display = "none";
-      video.muted = false;
+  overlay.style.display = "none";
 
-      try {
-        await video.play();
-      } catch (error) {
-        video.muted = true;
-        await video.play();
-      }
-    });
+  if (
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  ) {
+    try {
+      await DeviceOrientationEvent.requestPermission();
+    } catch (error) {
+      console.warn("Permission gyroscope refusée ou indisponible :", error);
+    }
+  }
+
+  video.muted = false;
+
+  try {
+    await video.play();
+  } catch (error) {
+    video.muted = true;
+    await video.play();
+  }
+});
 
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);

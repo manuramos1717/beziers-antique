@@ -13,6 +13,8 @@ body.page-360 {
   overflow: hidden;
   touch-action: none;
   overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body.page-video,
@@ -179,7 +181,7 @@ button,
   .video-grid {
     grid-template-columns: 1fr;
   }
- 
+
   .classic-video {
     border-radius: 10px;
   }

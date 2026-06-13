@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Marché antique de Baeterrae</title>
+
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="page-360">
+  <a href="index.html" class="back-link">←</a>
+
+  <div id="startOverlay" class="start-overlay">
+    <h1>Marché antique de Baeterrae</h1>
+    <p>Appuyez pour lancer la vidéo 360°.</p>
+    <p class="small">Tournez le téléphone ou faites glisser l’image avec le doigt.</p>
+    <button id="startButton" type="button">Lancer</button>
+  </div>
+
+  <a-scene
+    vr-mode-ui="enabled: true"
+    renderer="antialias: true"
+    embedded
+  >
+    <a-assets>
+      <video
+        id="video360"
+        src="https://pub-a5a1193c23dd41ae80da7eed54fb9f64.r2.dev/marche-baeterrae-360.mp4"
+        preload="auto"
+        crossorigin="anonymous"
+        playsinline
+        webkit-playsinline
+        loop
+      ></video>
+    </a-assets>
+
+    <a-videosphere src="#video360" rotation="0 -90 0"></a-videosphere>
+
+    <a-camera
+      look-controls="magicWindowTrackingEnabled: true"
+      wasd-controls="enabled: false"
+    ></a-camera>
+  </a-scene>
+
+  <script>
+    const overlay = document.getElementById("startOverlay");
+    const button = document.getElementById("startButton");
+    const video = document.getElementById("video360");
+
+    button.addEventListener("click", async () => {
+      overlay.style.display = "none";
+      video.muted = false;
+
+      try {
+        await video.play();
+      } catch (error) {
+        video.muted = true;
+        await video.play();
+      }
+    });
+  </script>
+</body>
+</html>

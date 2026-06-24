@@ -186,3 +186,12 @@ button,
     border-radius: 10px;
   }
 }
+
+.date-video {
+  margin-top: -10px;
+  margin-bottom: 18px;
+  color: #c9a46a;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
